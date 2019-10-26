@@ -33,11 +33,11 @@ def home():
             request.json['secret'] != config['secret']:
         return abort(403)
 
-    send_magic_packet(config['mac'])
+    send_magic_packet(config['mac_to_wake'])
     time.sleep(2) # wait a bit for the PC to wake
 
     # ping PC, see if it's up
-    ping_result = os.system("ping -c 1 " + config['ip'])
+    ping_result = os.system("ping -c 1 " + config['ip_to_ping'])
 
     if ping_result == 0:
         return 'success', 200
