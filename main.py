@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from flask import Flask, abort, request
-from wakeonlan import send_magic_packet
 import os, time, json
 
 def get_abs_path(file_name):
@@ -33,7 +32,16 @@ def home():
             request.json['secret'] != config['secret']:
         return abort(403)
 
-    send_magic_packet(config['mac_to_wake'])
+    # etherwake requires this server to be run as root. The reason I'm not using the wakeonlan
+    # Python library anymore is because it doesn't let me pick the interface through which the magic
+    # packets get sent through. This is a problem, as the main network interface of the Raspberry is
+    # wlan0, which enables it to have an Internet connection through which to serve the HTTP server.
+    # This is fine and dandy, until you consider that the magic packets get routed through there by
+    # default as well, which kinda defeats the purpose of this endeavor.
+    etherwake_result = os.system('etherwake -i eth0 ' + config['mac_to_wake'])
+    if (etherwake_result == 1):
+        return 'is etherwake installed?', 500
+
     time.sleep(2) # wait a bit for the PC to wake
 
     # ping PC, see if it's up
@@ -42,7 +50,7 @@ def home():
     if ping_result == 0:
         return 'success', 200
     else:
-        return 'gone', 410
+        return 'not_responding', 502
 
 if __name__ == "__main__":
     app.run(host=config['ip_rouser'], port=config['port_rouser'])
