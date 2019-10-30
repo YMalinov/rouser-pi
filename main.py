@@ -42,13 +42,13 @@ def home():
     if (etherwake_result == 1):
         return 'is etherwake installed?', 500
 
-    time.sleep(2) # wait a bit for the PC to wake
+    time.sleep(5) # wait a bit for the PC to wake
 
     # ping PC, see if it's up
-    ping_result = os.system("ping -c 1 " + config['ip_to_ping'])
-
-    if ping_result == 0:
-        return 'success', 200
+    for i in range(5):
+        ping_result = os.system("ping -c 1 " + config['ip_to_ping'])
+        if ping_result == 0:
+            return 'success', 200
     else:
         return 'not_responding', 502
 
