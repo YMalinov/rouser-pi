@@ -22,6 +22,14 @@ def load_config():
 
     return config
 
+def check_if_up(ip):
+    for i in range(5):
+        ping_result = os.system("ping -c 1 " + ip)
+        if ping_result == 0:
+            return True
+    else:
+        return False
+
 
 app = Flask(__name__)
 config = load_config()
@@ -44,13 +52,11 @@ def home():
 
     time.sleep(5) # wait a bit for the PC to wake
 
-    # ping PC, see if it's up
-    for i in range(5):
-        ping_result = os.system("ping -c 1 " + config['ip_to_ping'])
-        if ping_result == 0:
-            return 'success', 200
-    else:
-        return 'not_responding', 502
+    return ('success', 200) if check_if_up(config['ip_to_ping']) else ('not_responding', 502)
+
+@app.route("/ping", methods=['GET'])
+def ping():
+    return ('success', 200) if check_if_up(config['ip_to_ping']) else ('not_responding', 502)
 
 if __name__ == "__main__":
     app.run(host=config['ip_rouser'], port=config['port_rouser'])
