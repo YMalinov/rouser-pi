@@ -13,16 +13,21 @@ def load_config():
         'ip_rouser',
         'port_rouser',
         'mac_to_wake',
+        'ip_to_ping_from',
         'ip_to_ping',
         'secret',
     ]
 
     for key in expected_config_keys:
-        if key not in config: raise ValueError(key, 'not in config')
+        if key not in config:
+            raise ValueError(key, 'not in config')
 
     return config
 
 def check_if_up(ip):
+    # ensure eth0 is on the correct IP
+    os.system('ifconfig eth0 %s netmask 255.255.255.0' % config['ip_to_ping_from'])
+
     for i in range(5):
         ping_result = os.system("ping -c 1 " + ip)
         if ping_result == 0:
