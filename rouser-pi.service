@@ -1,0 +1,11 @@
+[Service]
+WorkingDirectory=/home/user/src/rouser-pi
+ExecStart=python3 /home/user/src/rouser-pi/main.py
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=http_rouser
+User=root
+Group=root
+[Install]
+WantedBy=multi-user.target
