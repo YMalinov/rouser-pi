@@ -4,7 +4,7 @@ ExecStart=python3 /home/user/src/rouser-pi/main.py
 Restart=always
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=http_rouser
+SyslogIdentifier=rouser-pi
 User=root
 Group=root
 [Install]
