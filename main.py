@@ -39,10 +39,42 @@ def check_if_up(ip):
 app = Flask(__name__)
 config = load_config()
 
+def valid_secret(json):
+    if 'secret' not in json or json['secret'] != config['secret']:
+        return False
+
+    return True
+
+##########################################################################
+# Unrelated to rouser-pi, related to room-dash project
+
+@app.route("/monitor/on", methods=['POST'])
+def monitor_on():
+    if not valid_secret(request.json):
+        return abort(403)
+
+    result = os.system('vcgencmd display_power 1')
+    if result != 0:
+        return 'error', 500
+
+    return 'success', 200
+
+@app.route("/monitor/off", methods=['POST'])
+def monitor_off():
+    if not valid_secret(request.json):
+        return abort(403)
+
+    result = os.system('vcgencmd display_power 0')
+    if result != 0:
+        return 'error', 500
+
+    return 'success', 200
+
+##########################################################################
+
 @app.route("/wake", methods=['POST'])
 def wake():
-    if 'secret' not in request.json or \
-            request.json['secret'] != config['secret']:
+    if not valid_secret(request.json):
         return abort(403)
 
     # ensure eth0 is up - not sure if this is an issue with my particular Raspberry, but it looks
