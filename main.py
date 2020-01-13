@@ -71,7 +71,7 @@ def monitor_off():
     return 'success', 200
 
 @app.route('/monitor/status', methods=['POST'])
-def monitor_off():
+def monitor_status():
     if not valid_secret(request.json):
         return abort(403)
 
