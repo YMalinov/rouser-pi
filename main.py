@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from flask import Flask, abort, request
-import os, time, json
+import os, time, json, subprocess
 
 def get_abs_path(file_name):
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -48,7 +48,7 @@ def valid_secret(json):
 ##########################################################################
 # Unrelated to rouser-pi, related to room-dash project
 
-@app.route("/monitor/on", methods=['POST'])
+@app.route('/monitor/on', methods=['POST'])
 def monitor_on():
     if not valid_secret(request.json):
         return abort(403)
@@ -59,7 +59,7 @@ def monitor_on():
 
     return 'success', 200
 
-@app.route("/monitor/off", methods=['POST'])
+@app.route('/monitor/off', methods=['POST'])
 def monitor_off():
     if not valid_secret(request.json):
         return abort(403)
@@ -70,9 +70,23 @@ def monitor_off():
 
     return 'success', 200
 
+@app.route('/monitor/status', methods=['POST'])
+def monitor_status():
+    if not valid_secret(request.json):
+        return abort(403)
+
+    result = subprocess.run(['vcgencmd', 'display_power'], capture_output = True)
+    if result.returncode != 0 or not result.stdout:
+        return 'error', 500
+
+    # stdout should look as follows:
+    #   display_power=0
+    status = result.stdout.decode('utf-8').strip().split('=')[1] == '1'
+    return str(status), 200
+
 ##########################################################################
 
-@app.route("/wake", methods=['POST'])
+@app.route('/wake', methods=['POST'])
 def wake():
     if not valid_secret(request.json):
         return abort(403)
@@ -98,7 +112,7 @@ def wake():
 
     return ('success', 200) if check_if_up(config['ip_to_ping']) else ('not responding', 502)
 
-@app.route("/ping", methods=['GET'])
+@app.route('/ping', methods=['GET'])
 def ping():
     return ('success', 200) if check_if_up(config['ip_to_ping']) else ('not responding', 502)
 
