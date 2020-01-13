@@ -65,7 +65,7 @@ def monitor_off():
         return abort(403)
 
     result = os.system('vcgencmd display_power 0')
-    if result.returncode != 0 or not result.stdout:
+    if result != 0:
         return 'error', 500
 
     return 'success', 200
@@ -81,7 +81,7 @@ def monitor_status():
 
     # stdout should look as follows:
     #   display_power=0
-    status = stdout.decode('utf-8').strip().split('=')[1] == '1'
+    status = result.stdout.decode('utf-8').strip().split('=')[1] == '1'
     return str(status), 200
 
 ##########################################################################
