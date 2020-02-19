@@ -2,6 +2,7 @@
 WorkingDirectory=/home/user/src/rouser-pi
 ExecStart=python3 /home/user/src/rouser-pi/main.py
 Restart=always
+RestartSec=15s
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=rouser-pi
